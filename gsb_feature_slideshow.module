@@ -1,0 +1,53 @@
+<?php
+
+/**
+ * @file
+ *
+ * Defines a custom field - gsb_slideshow.
+ *
+ */
+
+/**
+ * Implements hook_field_info().
+ *
+ * Here we tell Drupal about our custom fields.
+ * Its machine-readable name is 'gsb_slideshow'.
+ */
+function gsb_feature_slideshow_field_info() {
+  return array(
+    'gsb_slideshow' => array(
+      'label' => t('Slideshow'),
+      'description' => t('The gsb slideshow field'),
+      'default_widget' => 'gsb_slideshow_widget',
+      'default_formatter' => 'gsb_slideshow_default_format',
+      'settings' => array(
+        'uri_scheme' => variable_get('file_default_scheme', 'public'),
+        'default_image' => 1,
+      ),
+      'instance_settings' => array(
+        'file_extensions' => 'jpg jpeg gif png',
+        'file_directory' => 'general',
+        'max_filesize' => '',
+        'alt_field' => 0,
+        'title_field' => 0,
+        'max_resolution' => '',
+        'min_resolution' => '',
+      ),
+    ),
+  );
+}
+
+/**
+ * Implements hook_field_widget_info().
+ *
+ * Here we tell Drupal about our custom widget - gsb_slideshow_widget. 
+ */
+function gsb_slideshow_field_widget_info() {
+  return array(
+    'gsb_slideshow_widget' => array(
+      'label' => t('Default'),
+      'field types' => array('gsb_slideshow'),
+    ),
+  );
+}
+
