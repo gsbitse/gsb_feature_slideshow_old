@@ -3,20 +3,51 @@
 /**
  * @file
  *
- * Defines a custom field - gsb_slideshow.
+ * Defines a custom fpp - gsb_slideshow_fpp.
+ * 
+ * Also defines a custom field - gsb_slideshow, and
+ * custom widget gsb_slideshow_widget.
  *
  */
+ 
+ /**
+ * Implements hook_entity_info_alter().
+ *
+ * Here we tell Drupal about our custom fpp - 
+ * 'gsb_slideshow_fpp'.
+ * 
+ */
+ 
+ function gsb_feature_slideshow_entity_info_alter(&$entity_info) {
+
+  $entity_info['fieldable_panels_pane']['bundles']['gsb_slideshow_fpp'] = array(
+    'label' => t('Add slideshow'),
+    'pane category' => t('GSB Slideshow FPP'),
+    'pane top level' => TRUE, // set to true to make this show as a top level icon
+    'pane icon' => drupal_get_path('module', 'panopoly_widgets') . '/images/icon_text.png',
+    'admin' => array(
+      'path' => 'admin/structure/fieldable-panels-panes/manage/%fieldable_panels_panes_type',
+      'bundle argument' => 4,
+      // Note that this has all _ replaced with - from the bundle name.
+      'real path' => 'admin/structure/fieldable-panels-panes/manage/gsb-slideshow-fpp',
+      'access arguments' => array('administer fieldable panels panes'),
+    ),
+  );
+
+}
+
 
 /**
  * Implements hook_field_info().
  *
  * Here we tell Drupal about our custom fields.
  * Its machine-readable name is 'gsb_slideshow'.
+ * 
  */
 function gsb_feature_slideshow_field_info() {
   return array(
     'gsb_slideshow' => array(
-      'label' => t('Slideshow'),
+      'label' => t('GSB Slideshow'),
       'description' => t('The gsb slideshow field'),
       'default_widget' => 'gsb_slideshow_widget',
       'default_formatter' => 'gsb_slideshow_default_format',
@@ -40,14 +71,64 @@ function gsb_feature_slideshow_field_info() {
 /**
  * Implements hook_field_widget_info().
  *
- * Here we tell Drupal about our custom widget - gsb_slideshow_widget. 
+ * Here we tell Drupal about our custom widget - 
+ * 'gsb_slideshow_widget'.
+ * 
  */
 function gsb_slideshow_field_widget_info() {
   return array(
     'gsb_slideshow_widget' => array(
-      'label' => t('Default'),
+      'label' => t('Default Slideshow'),
       'field types' => array('gsb_slideshow'),
     ),
   );
 }
+
+/**
+ * Implements hook_field_widget_form().
+ *
+ * http://api.drupal.org/api/drupal/modules--field--field.api.php/function/hook_field_widget_form/7
+ * 
+ * Here we define a form element that the user inputs data into. 
+ * 
+ */
+function gsb_feature_slideshow_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
+
+  if ($instance['widget']['type'] == 'gsb_slideshow_widget') {
+   
+    // Make it a multipart form  
+    $form['#attributes']['enctype'] = 'multipart/form-data';
+
+    // Define the element
+    $element['title'] = array(
+      '#title' => 'Title',
+      '#type' => 'textfield',
+      '#default_value' => isset($items[$delta]['title']) ? $items[$delta]['title'] : NULL,
+    );
+
+    $element['link'] = array(
+      '#title' => 'Link',
+      '#type' => 'textfield',
+      '#default_value' => isset($items[$delta]['link']) ? $items[$delta]['link'] : NULL,
+    );
+
+    $element['fid'] = array(
+      '#title' => 'Image',
+      '#type' => 'managed_file',
+      '#upload_location' => file_field_widget_uri($field, $instance),
+      '#default_value' => isset($items[$delta]['fid']) ? $items[$delta]['fid'] : NULL,
+    );
+
+    $element['description'] = array(
+      '#title' => 'Description',
+      '#type' => 'textarea',
+      '#rows' => '2',
+      '#resizable' => FALSE,
+      '#default_value' => isset($items[$delta]['description']) ? $items[$delta]['description'] : NULL,
+    );
+  }
+
+  return $element;
+}
+
 
