@@ -42,8 +42,8 @@
 /**
  * Implements hook_field_info().
  *
- * Here we tell Drupal about our custom fields.
- * Its machine-readable name is 'gsb_slideshow'.
+ * Here we tell Drupal about our custom field - 
+ * its machine-readable name is 'gsb_slideshow'.
  * 
  */
 function gsb_feature_slideshow_field_info() {
@@ -154,7 +154,7 @@ function gsb_feature_slideshow_field_is_empty($item, $field) {
   return FALSE;
 }
 
-// Settings form
+// Field Settings Form
 
 /**
  * Implements hook_field_settings_form()
@@ -206,6 +206,10 @@ function gsb_feature_slideshow_field_instance_settings_form($field, $instance) {
 
 /**
  * Implementation of hook_field_formatter_info().
+ *
+ * Here we tell Drupal about our custom field formatter - 
+ * 'gsb_slideshow_default_format'. 
+ *
  */
 function gsb_feature_slideshow_field_formatter_info() {
   return array(
@@ -226,7 +230,6 @@ function gsb_feature_slideshow_field_formatter_view($entity_type, $entity, $fiel
 
   $element = array();
 
-/*
   $settings = $display['settings'];
   $formatter = $display['type'];
   
@@ -241,11 +244,173 @@ function gsb_feature_slideshow_field_formatter_view($entity_type, $entity, $fiel
 
   // Assemble the tabs content
   foreach ($items as $delta => $item_data) {
-    $element[$delta]['#markup'] = ($delta == 0) ? $header . theme('panopoly_spotlight_view', array('items' => $item_data, 'delta' => $delta, 'settings' => $settings)) : theme('panopoly_spotlight_view', array('items' => $item_data, 'delta' => $delta, 'settings' => $settings));
+    $element[$delta]['#markup'] = ($delta == 0) ? 
+      $header . 
+      theme('gsb_slideshow_view', array('items' => $item_data, 'delta' => $delta, 'settings' => $settings)) : 
+      theme('gsb_slideshow_view', array('items' => $item_data, 'delta' => $delta, 'settings' => $settings));
   }
-*/
   
   return $element;
 }
 
+// Formatter Settings Form
 
+/**
+ * Implements hook_field_formatter_settings_form().
+ */
+function gsb_feature_slideshow_field_formatter_settings_form($field, $instance, $view_mode, $form, &$form_state) {
+
+  $display = $instance['display'][$view_mode];
+  $settings = $display['settings'];
+  
+  $element = array();
+
+  if ($display['type'] == 'gsb_slideshow_default_format') {
+    $element['image_style'] = array(
+      '#title' => t('Image style'), 
+      '#type' => 'select',
+      '#options' => image_style_options(),
+      '#default_value' => $settings['image_style'],
+      '#required' => TRUE,
+    );
+  }
+
+  return $element;
+}
+
+/**
+ * Implements hook_field_formatter_settings_summary().
+ */
+function gsb_feature_slideshow_field_formatter_settings_summary($field, $instance, $view_mode) {
+
+  $display = $instance['display'][$view_mode];
+  $settings = $display['settings'];
+  
+  $summary = t('Image Style: @style', array('@style' => $settings['image_style']));
+  
+  return $summary;
+}
+
+// Field I/O
+
+/**
+ * Implements hook_field_presave()
+ */
+function gsb_feature_slideshow_field_presave($entity_type, $entity, $field, $instance, $langcode, &$items) {
+
+  // We need to set presave values if fids are not set. This shouldn't effect save operations
+  // form API validation will prevent this from ever happening unless previewing.
+  
+  if (!empty($items)) {
+    foreach ($items as &$item) {
+      if (empty($item['fid'])) {
+        $fid = variable_get('panopoly_widgets_default_' . $entity->bundle . '_fid', NULL);
+        if (!empty($fid)) {
+          $item['fid'] = $fid;
+        }
+      }
+    }
+
+    image_field_presave($entity_type, $entity, $field, $instance, $langcode, $items);
+  }
+  
+}
+
+/**
+ * Implements hook_field_load().
+ */
+function gsb_feature_slideshow_field_load($entity_type, $entities, $field, $instances, $langcode, &$items, $age) {
+  image_field_load($entity_type, $entities, $field, $instances, $langcode, $items, $age);
+}
+
+/**
+ * Implements hook_field_insert().
+ */
+function gsb_feature_slideshow_field_insert($entity_type, $entity, $field, $instance, $langcode, &$items) {
+  image_field_insert($entity_type, $entity, $field, $instance, $langcode, $items);
+}
+
+/**
+ * Implements hook_field_update().
+ */
+function gsb_feature_slideshow_field_update($entity_type, $entity, $field, $instance, $langcode, &$items) {
+
+  // Load the original entity, if $entity->original is not already set.
+  // This is done as per http://drupal.org/node/985642 and can be removed when that patch is committed. 
+  
+  if (empty($entity->original)) {
+    $entity->original = entity_load_unchanged($entity_type, $field['id']);
+  }
+
+  image_field_update($entity_type, $entity, $field, $instance, $langcode, $items);
+}
+
+/**
+ * Implements hook_field_delete().
+ */
+function gsb_feature_slideshow_field_delete($entity_type, $entity, $field, $instance, $langcode, &$items) {
+  image_field_delete($entity_type, $entity, $field, $instance, $langcode, $items);
+}
+
+/**
+ * Implements hook_field_delete_revision().
+ */
+function gsb_feature_slideshow_field_delete_revision($entity_type, $entity, $field, $instance, $langcode, &$items) {
+  image_field_delete_revision($entity_type, $entity, $field, $instance, $langcode, $items);
+}
+
+// Views
+
+/**
+ * Implements hook_field_prepare_view().
+ */
+function gsb_feature_slideshow_field_prepare_view($entity_type, $entities, $field, $instances, $langcode, &$items) {
+  
+  // If there are no files specified at all, use the default.
+  
+  foreach ($entities as $id => $entity) {
+    if (empty($items[$id]) && $field['settings']['default_image']) {
+      if ($file = file_load($field['settings']['default_image'])) {
+        $items[$id][0] = (array) $file + array(
+          'is_default' => TRUE,
+          'alt' => '',
+          'title' => '',
+        );
+      }
+    }
+  }
+  
+}
+
+/**
+ * Theme function for table view
+ */
+function theme_gsb_slideshow_view($variables) {
+
+  $title = $variables['items']['title'];
+  $description = $variables['items']['description'];
+  
+  if (module_exists('uuid')) {
+    $image_entity = entity_uuid_load('file', array($variables['items']['uuid']));
+    $image = file_load(array_pop($image_entity)->fid);
+  }
+  else {
+    $image = (object) $variables['items'];
+  }
+  
+  $link = $variables['items']['link'];
+  $settings = $variables['settings'];
+
+  $output = '<div id="' . 'panopoly-spotlight-' . $variables['delta'] . '" class="' . 'panopoly-spotlight' . '">';
+  $output .= theme('image_style', array('style_name' => $settings['image_style'], 'path' => $image->uri));
+  $output .= '<div class="panopoly-spotlight-wrapper">';
+  $output .= '<h3 class="panopoly-spotlight-label">' . t('Slideshow') . '</h3>';
+  $output .= '<div class="panopoly-spotlight-info">';
+  $output .= '<h2>' . l($title, $link) . '</h2>';
+  $output .= '<p>' . $description . '</p>';
+  $output .= '</div>';
+  $output .= '</div>';
+  $output .= '</div>';
+
+  return $output;
+}
