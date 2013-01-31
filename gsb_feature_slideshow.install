@@ -2,6 +2,7 @@
 function gsb_feature_slideshow_field_schema($field) {
 
   if ($field['type'] == 'gsb_slideshow') {
+    
     $schema['columns']['title'] = array(
       'type' => 'varchar',
       'length' => '255',
@@ -39,4 +40,5 @@ function gsb_feature_slideshow_field_schema($field) {
 
     return $schema;
   }
+  
 }
