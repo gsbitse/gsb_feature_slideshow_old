@@ -17,7 +17,6 @@
  * 'gsb_slideshow_fpp'.
  * 
  */
- 
  function gsb_feature_slideshow_entity_info_alter(&$entity_info) {
 
   $entity_info['fieldable_panels_pane']['bundles']['gsb_slideshow_fpp'] = array(
@@ -35,7 +34,6 @@
   );
 
 }
-
 
 /**
  * Implements hook_field_info().
@@ -75,13 +73,17 @@ function gsb_feature_slideshow_field_info() {
  * 'gsb_slideshow_widget'.
  * 
  */
-function gsb_slideshow_field_widget_info() {
+function gsb_feature_slideshow_field_widget_info() {
   return array(
     'gsb_slideshow_widget' => array(
       'label' => t('Default Slideshow'),
       'field types' => array('gsb_slideshow'),
+      'behaviors' => array(
+        'multiple values' => FIELD_BEHAVIOR_DEFAULT,
+        'default value' => FIELD_BEHAVIOR_DEFAULT,
+      ),
     ),
-  );
+  );  
 }
 
 /**
@@ -130,5 +132,22 @@ function gsb_feature_slideshow_field_widget_form(&$form, &$form_state, $field, $
 
   return $element;
 }
+
+/**
+ * Implements hook_field_is_empty().
+ *
+ * gsb_feature_slideshow_field_is_empty() lets Drupal know whether or not to process input
+ * at all; if the field is empty, it won't bother validating
+ * or saving the values.
+ *
+ */
+function gsb_feature_slideshow_field_is_empty($item, $field) {
+  if (empty($item['title']) && empty($item['link']) && empty($item['description']) && empty($item['fid'])) {
+    return TRUE;
+  }
+  return FALSE;
+}
+
+
 
 
