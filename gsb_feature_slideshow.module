@@ -151,6 +151,13 @@ function gsb_feature_slideshow_field_widget_form(&$form, &$form_state, $field, $
       '#resizable' => FALSE,
       '#default_value' => isset($items[$delta]['description']) ? $items[$delta]['description'] : NULL,
     );
+
+    $element['button_text'] = array(
+      '#title' => 'Button Text',
+      '#type' => 'textfield',
+      '#default_value' => isset($items[$delta]['button_text']) ? $items[$delta]['button_text'] : NULL,
+    );
+
   }
 
   return $element;
@@ -165,7 +172,11 @@ function gsb_feature_slideshow_field_widget_form(&$form, &$form_state, $field, $
  *
  */
 function gsb_feature_slideshow_field_is_empty($item, $field) {
-  if (empty($item['title']) && empty($item['link']) && empty($item['description']) && empty($item['fid'])) {
+  if (empty($item['title']) &&
+      empty($item['link']) &&
+      empty($item['description']) &&
+      empty($item['button_text']) &&
+      empty($item['fid'])) {
     return TRUE;
   }
   return FALSE;
@@ -426,6 +437,7 @@ function theme_gsb_slideshow_view($variables) {
 
   $title = $variables['items']['title'];
   $description = $variables['items']['description'];
+  $button_text = $variables['items']['button_text'];
   
   if (module_exists('uuid')) {
     $image_entity = entity_uuid_load('file', array($variables['items']['uuid']));
@@ -445,6 +457,7 @@ function theme_gsb_slideshow_view($variables) {
   $output .= '<div class="panopoly-spotlight-info">';
   $output .= '<h2>' . l($title, $link) . '</h2>';
   $output .= '<p>' . $description . '</p>';
+  $output .= '<p>' . $button_text . '</p>';
   $output .= '</div>';
   $output .= '</div>';
   $output .= '</div>';
