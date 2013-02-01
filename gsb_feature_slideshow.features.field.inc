@@ -14,7 +14,7 @@ function gsb_feature_slideshow_field_default_fields() {
   $fields['fieldable_panels_pane-gsb_slideshow_fpp-field_gsb_slideshow'] = array(
     'field_config' => array(
       'active' => '1',
-      'cardinality' => '1',
+      'cardinality' => '-1',
       'deleted' => '0',
       'entity_types' => array(),
       'field_name' => 'field_gsb_slideshow',
