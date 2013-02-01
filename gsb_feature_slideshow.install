@@ -27,6 +27,12 @@ function gsb_feature_slideshow_field_schema($field) {
       'not null' => FALSE,
     );
 
+    $schema['columns']['button_text'] = array(
+      'type' => 'text',
+      'size' => 'big',
+      'not null' => FALSE,
+    );
+
     $schema['indexes'] = array(
       'fid' => array('fid'),
     );
