@@ -310,8 +310,11 @@ function gsb_feature_slideshow_field_presave($entity_type, $entity, $field, $ins
         }
       }
     }
+    
+    if (isset($items['fid']) && $items['fid'] != 0) {
+      image_field_presave($entity_type, $entity, $field, $instance, $langcode, $items);
+    }    
 
-    image_field_presave($entity_type, $entity, $field, $instance, $langcode, $items);
   }
   
 }
