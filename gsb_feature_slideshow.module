@@ -9,7 +9,24 @@
  * custom widget gsb_slideshow_widget.
  *
  */
- 
+
+/**
+ * Implements hook_init()
+ *
+ * Here we tell Drupal about our javascript file
+ *
+ */
+function gsb_feature_slideshow_init() {
+
+  // Include the Spotlight Rotation time setting
+  $rotation_time = 1000 * variable_get('panopoly_widgets_spotlight_rotation_time', 4);
+  $js_variables = array('gsb_slideshow_settings' => array('rotation_time' => $rotation_time));
+  drupal_add_js($js_variables, 'setting');
+
+  // Add our custom javascript to the footer to override other things.
+  drupal_add_js(drupal_get_path('module', 'gsb_feature_slideshow') . '/gsb_feature_slideshow.js', array('scope' => 'footer'));
+}
+
  // Create the custom fpp - gsb_slideshow_fpp
  
  /**
@@ -383,6 +400,23 @@ function gsb_feature_slideshow_field_prepare_view($entity_type, $entities, $fiel
     }
   }
   
+}
+
+// Theme hookup and markup
+
+/**
+ * Implements hook_theme().
+ */
+function gsb_feature_slideshow_theme($existing, $type, $theme, $path) {
+  return array(
+    'gsb_slideshow_view' => array(
+      'variables' => array(
+        'items' => NULL,
+        'delta' => NULL,
+        'settings' => NULL,
+      ),
+    ),
+  );
 }
 
 /**
