@@ -33,6 +33,12 @@ function gsb_feature_slideshow_field_schema($field) {
       'not null' => FALSE,
     );
 
+    $schema['columns']['button_style'] = array(
+      'type' => 'varchar',
+      'length' => '255',
+      'not null' => FALSE,
+    );
+
     $schema['indexes'] = array(
       'fid' => array('fid'),
     );
