@@ -158,6 +158,14 @@ function gsb_feature_slideshow_field_widget_form(&$form, &$form_state, $field, $
       '#default_value' => isset($items[$delta]['button_text']) ? $items[$delta]['button_text'] : NULL,
     );
 
+    $options = drupal_map_assoc(array("style 1", "style 2", "style 3"));
+    $element['button_style'] = array(
+      '#title' => 'Button Style',
+      '#type' => 'select',
+      '#options' => $options,
+      '#default_value' => isset($items[$delta]['button_style']) ? $items[$delta]['button_style'] : NULL,
+    );
+
   }
 
   return $element;
@@ -176,6 +184,7 @@ function gsb_feature_slideshow_field_is_empty($item, $field) {
       empty($item['link']) &&
       empty($item['description']) &&
       empty($item['button_text']) &&
+      empty($item['button_style']) &&          
       empty($item['fid'])) {
     return TRUE;
   }
@@ -438,6 +447,7 @@ function theme_gsb_slideshow_view($variables) {
   $title = $variables['items']['title'];
   $description = $variables['items']['description'];
   $button_text = $variables['items']['button_text'];
+  $button_style = $variables['items']['button_style'];
   
   if (module_exists('uuid')) {
     $image_entity = entity_uuid_load('file', array($variables['items']['uuid']));
@@ -458,6 +468,7 @@ function theme_gsb_slideshow_view($variables) {
   $output .= '<h2>' . l($title, $link) . '</h2>';
   $output .= '<p>' . $description . '</p>';
   $output .= '<p>' . $button_text . '</p>';
+  $output .= '<p>' . $button_style . '</p>';
   $output .= '</div>';
   $output .= '</div>';
   $output .= '</div>';
