@@ -137,12 +137,45 @@ function gsb_feature_slideshow_field_widget_form(&$form, &$form_state, $field, $
       '#default_value' => isset($items[$delta]['link']) ? $items[$delta]['link'] : NULL,
     );
 
+    /*
     $element['fid'] = array(
       '#title' => 'Image',
       '#type' => 'managed_file',
       '#upload_location' => file_field_widget_uri($field, $instance),
       '#default_value' => isset($items[$delta]['fid']) ? $items[$delta]['fid'] : NULL,
     );
+    */
+    
+    $element['fid'] = array(
+      '#title' => 'Image or Video',
+      '#type' => 'media',
+      '#collapsed' => TRUE,
+      '#upload_location' => file_field_widget_uri($field, $instance),
+      '#default_value' => isset($items[$delta]['fid']) ? $items[$delta]['fid'] : NULL,
+      '#media_options' => array(
+        'global' => array('types' => array('image'), 'enabledPlugins' => array('gsb_media_browser--images')),
+      )
+    );
+
+  /*
+  $element += array(
+    '#type' => 'media', // Would like to make this a fieldset, but throws some weird warning about element_children... not sure what it is about yet.
+    '#collapsed' => TRUE,
+    '#default_value' => $current_value,
+    '#required' => $instance['required'],
+    '#media_options' => array(
+      'global' => array(
+        'types' => array_filter($widget_settings['allowed_types']),
+        'enabledPlugins' => array_filter($instance['widget']['settings']['browser_plugins']),
+        'schemes' => $widget_settings['allowed_schemes'],
+        'file_directory' => isset($field_settings['file_directory']) ? $field_settings['file_directory'] : '',
+        'file_extensions' => isset($field_settings['file_extensions']) ? $field_settings['file_extensions'] : media_variable_get('file_extensions'),
+        'max_filesize' => isset($field_settings['max_filesize']) ? $field_settings['max_filesize'] : 0,
+        'uri_scheme' => !empty($field['settings']['uri_scheme']) ? $field['settings']['uri_scheme'] : file_default_scheme(),
+      ),
+    ),
+  );
+  */    
 
     $element['description'] = array(
       '#title' => 'Description',
