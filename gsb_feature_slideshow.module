@@ -38,6 +38,10 @@ function gsb_feature_slideshow_init() {
  */
  function gsb_feature_slideshow_entity_info_alter(&$entity_info) {
 
+  // create the GSB Slideshow FPP
+
+   $test = 'test';
+
   $entity_info['fieldable_panels_pane']['bundles']['gsb_slideshow_fpp'] = array(
     'label' => t('Add slideshow'),
     'pane category' => t('GSB Slideshow FPP'),
@@ -50,6 +54,13 @@ function gsb_feature_slideshow_init() {
       'real path' => 'admin/structure/fieldable-panels-panes/manage/gsb-slideshow-fpp',
       'access arguments' => array('administer fieldable panels panes'),
     ),
+  );
+
+  // create the slide show view mode
+
+  $entity_info['file']['view modes']['gsb_slideshow'] = array(
+    'label' => t('GSB Slideshow'),
+    'custom settings' => TRUE,
   );
 
 }
@@ -152,8 +163,29 @@ function gsb_feature_slideshow_field_widget_form(&$form, &$form_state, $field, $
       '#collapsed' => TRUE,
       '#upload_location' => file_field_widget_uri($field, $instance),
       '#default_value' => isset($items[$delta]['fid']) ? $items[$delta]['fid'] : NULL,
+      '#description' => '',
       '#media_options' => array(
-        'global' => array('types' => array('image'), 'enabledPlugins' => array('gsb_media_browser--images')),
+        'global' => array(
+          'types' => array(
+            'image',
+            'video'
+          ),
+          'enabledPlugins' => array(
+            'gsb_media_center_image',
+            'gsb_media_center_video'
+          ),
+        ),
+        // line 38 of profiles/gsb_public/modules/contrib/media/includes/media.browser.inc
+        //gsb_media_center_image
+        //gsb_media_center_video
+        //gsb_media_browser--images
+        //gsb_media_browser--videos
+        //gsb_media_browser--files_and_docs
+        //gsb_media_center_document
+        //media_default--media_browser_1
+        //media_default--media_browser_my_files
+        //media_internet
+        //upload
       )
     );
 
@@ -286,9 +318,7 @@ function gsb_feature_slideshow_field_formatter_info() {
     'gsb_slideshow_default_format' => array(
       'label' => t('Default'),
       'field types' => array('gsb_slideshow'),
-      'settings' => array(       
-        'image_style' => 'panopoly_image_spotlight', 
-      ),
+      'settings' => array('file_view_mode' => 'default'),
     ),
   );
 }
@@ -336,12 +366,12 @@ function gsb_feature_slideshow_field_formatter_settings_form($field, $instance, 
   $element = array();
 
   if ($display['type'] == 'gsb_slideshow_default_format') {
-    $element['image_style'] = array(
-      '#title' => t('Image style'), 
-      '#type' => 'select',
-      '#options' => image_style_options(),
-      '#default_value' => $settings['image_style'],
-      '#required' => TRUE,
+    $element['file_view_mode'] = array(
+      '#title'   => t('View mode'),
+      '#type'    => 'select',
+      '#options' => file_entity_view_mode_labels(),
+      '#default_value' => $settings['file_view_mode'],
+      // Never empty, so no #empty_option
     );
   }
 
@@ -356,8 +386,10 @@ function gsb_feature_slideshow_field_formatter_settings_summary($field, $instanc
   $display = $instance['display'][$view_mode];
   $settings = $display['settings'];
   
-  $summary = t('Image Style: @style', array('@style' => $settings['image_style']));
-  
+  //$summary = t('Image Style: @style', array('@style' => $settings['image_style']));
+
+  $summary = t('View Mode: @viewmode', array('@viewmode' => $settings['file_view_mode']));
+
   return $summary;
 }
 
@@ -493,8 +525,82 @@ function theme_gsb_slideshow_view($variables) {
   $link = $variables['items']['link'];
   $settings = $variables['settings'];
 
+  if ($variables['items'] == null) {
+    return;
+  }
+  
+  $image = file_view((object) $variables['items'], $variables['settings']['file_view_mode']);
+
   $output = '<div id="' . 'panopoly-spotlight-' . $variables['delta'] . '" class="' . 'panopoly-spotlight' . '">';
-  $output .= theme('image_style', array('style_name' => $settings['image_style'], 'path' => $image->uri));
+
+  if ($variables['items']['type'] == 'image') {
+
+    // Render the image
+
+    $output .= render($image);
+
+  }
+  elseif ($variables['items']['type'] == 'video') {
+
+    // Get the video path.
+
+    $video_path = drupal_realpath($variables['items']['uri']);
+
+    // If it's a youtube video we need to use the embed url.
+
+    if ($variables['items']['filemime'] == 'video/youtube') {
+      $video_parts = drupal_parse_url($video_path);
+      if (stristr($video_parts['path'], 'watch')) {
+        $video_path = str_replace('watch', 'embed', $video_parts['path']) . "/" . $video_parts['query']['v'];
+      }
+      $video_path .= '?autoplay=1';
+    }
+
+    // Create the image.
+
+    //$output .= render($image);
+
+    $img_tag = theme_image_style(array(
+      'style_name' => $image['file']['#style_name'],
+      'path' => $image['file']['#path'],
+      'alt' => $variables['items']['filename'],
+      'width' => NULL,
+      'height' => NULL
+    ));
+
+    // Print a link wrapper so that it can open in a modal.
+
+    $output .= '<div class="field field-type-image field-name-field-gsb-spotlight-media">';
+    $output .=  l($img_tag, $video_path, array('attributes' => array('class' => 'fancybox fancybox.iframe'), 'html' => TRUE));
+    $output .=  '<span class="video-play-icon"></span></div>';
+  }
+
+  /*
+      if ($file->type == 'image') {
+        print render($content['field_gsb_spotlight_image_video']);
+      }
+      elseif ($file->type == 'video') {
+        // Get the video path.
+        $video_path = drupal_realpath($file->uri);
+        // If it's a youtube video we need to use the embed url.
+        if ($field_gsb_spotlight_image_video[0]['filemime'] == 'video/youtube') {
+          $video_parts = drupal_parse_url($video_path);
+          if (stristr($video_parts['path'], 'watch')) {
+            $video_path = str_replace('watch', 'embed', $video_parts['path']) . "/" . $video_parts['query']['v'];
+          }
+          $video_path .= '?autoplay=1';
+          //$video_path = str_replace('watch?v=', 'embed/', $video_path) . '?autoplay=1';
+        }
+        // Create the image.
+        render($content['field_gsb_spotlight_image_video']);
+        $img_tag = theme_image_style(array('style_name' => $content['field_gsb_spotlight_image_video'][0]['file']['#style_name'], 'path' => $content['field_gsb_spotlight_image_video'][0]['file']['#path'], 'alt' => $field_gsb_spotlight_image_video[0]['filename'], 'width' => NULL, 'height' => NULL));
+        // Print a link wrapper so that it can open in a modal.
+        print '<div class="field field-type-image field-name-field-gsb-spotlight-media">';
+        print l($img_tag, $video_path, array('attributes' => array('class' => 'fancybox fancybox.iframe'), 'html' => TRUE));
+        print '<span class="video-play-icon"></span></div>';
+      }
+  */
+
   $output .= '<div class="panopoly-spotlight-wrapper">';
   $output .= '<h3 class="panopoly-spotlight-label">' . t('Slideshow') . '</h3>';
   $output .= '<div class="panopoly-spotlight-info">';
