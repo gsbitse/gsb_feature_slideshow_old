@@ -1,10 +1,16 @@
 <?php
+/**
+ * @file
+ * Code for the GSB Feature Slideshow feature.
+ */
+
+include_once 'gsb_feature_slideshow.features.inc';
 
 /**
  * @file
  *
  * Defines a custom fpp - gsb_slideshow_fpp.
- * 
+ *
  * Also defines a custom field - gsb_slideshow, and
  * custom widget gsb_slideshow_widget.
  *
@@ -18,9 +24,11 @@
  */
 function gsb_feature_slideshow_init() {
 
-  // Include the Spotlight Rotation time setting
+  // Include the Slideshow Rotation time setting
+
   $rotation_time = 1000 * variable_get('panopoly_widgets_spotlight_rotation_time', 4);
   $js_variables = array('gsb_slideshow_settings' => array('rotation_time' => $rotation_time));
+
   drupal_add_js($js_variables, 'setting');
 
   // Add our custom javascript to the footer to override other things.
@@ -28,20 +36,20 @@ function gsb_feature_slideshow_init() {
 }
 
  // Create the custom fpp - gsb_slideshow_fpp
- 
+
  /**
  * Implements hook_entity_info_alter().
  *
- * Here we tell Drupal about our custom fpp - 
+ * Here we tell Drupal about our custom fpp -
  * 'gsb_slideshow_fpp'.
- * 
+ *
  */
  function gsb_feature_slideshow_entity_info_alter(&$entity_info) {
 
   // create the GSB Slideshow FPP
 
   $entity_info['fieldable_panels_pane']['bundles']['gsb_slideshow_fpp'] = array(
-    'label' => t('Add slideshow'),
+    'label' => t('Add GSB slideshow'),
     'pane category' => t('GSB Slideshow FPP'),
     'pane top level' => TRUE, // set to true to make this show as a top level icon
     'pane icon' => drupal_get_path('module', 'panopoly_widgets') . '/images/icon_text.png',
@@ -68,9 +76,9 @@ function gsb_feature_slideshow_init() {
 /**
  * Implements hook_field_info().
  *
- * Here we tell Drupal about our custom field - 
+ * Here we tell Drupal about our custom field -
  * its machine-readable name is 'gsb_slideshow'.
- * 
+ *
  */
 function gsb_feature_slideshow_field_info() {
   return array(
@@ -101,9 +109,9 @@ function gsb_feature_slideshow_field_info() {
 /**
  * Implements hook_field_widget_info().
  *
- * Here we tell Drupal about our custom widget - 
+ * Here we tell Drupal about our custom widget -
  * 'gsb_slideshow_widget'.
- * 
+ *
  */
 function gsb_feature_slideshow_field_widget_info() {
   return array(
@@ -115,22 +123,22 @@ function gsb_feature_slideshow_field_widget_info() {
         'default value' => FIELD_BEHAVIOR_DEFAULT,
       ),
     ),
-  );  
+  );
 }
 
 /**
  * Implements hook_field_widget_form().
  *
  * http://api.drupal.org/api/drupal/modules--field--field.api.php/function/hook_field_widget_form/7
- * 
- * Here we define a form element that the user inputs data into. 
- * 
+ *
+ * Here we define a form element that the user inputs data into.
+ *
  */
 function gsb_feature_slideshow_field_widget_form(&$form, &$form_state, $field, $instance, $langcode, $items, $delta, $element) {
 
   if ($instance['widget']['type'] == 'gsb_slideshow_widget') {
-   
-    // Make it a multipart form  
+
+    // Make it a multipart form
     $form['#attributes']['enctype'] = 'multipart/form-data';
 
     // Define the element
@@ -145,7 +153,7 @@ function gsb_feature_slideshow_field_widget_form(&$form, &$form_state, $field, $
       '#type' => 'textfield',
       '#default_value' => isset($items[$delta]['link']) ? $items[$delta]['link'] : NULL,
     );
-    
+
     $element['fid'] = array(
       '#title' => 'Image or Video',
       '#type' => 'media',
@@ -207,7 +215,7 @@ function gsb_feature_slideshow_field_is_empty($item, $field) {
       empty($item['link']) &&
       empty($item['description']) &&
       empty($item['button_text']) &&
-      empty($item['button_style']) &&          
+      empty($item['button_style']) &&
       empty($item['fid'])) {
     return TRUE;
   }
@@ -223,7 +231,7 @@ function gsb_feature_slideshow_field_is_empty($item, $field) {
 function gsb_feature_slideshow_field_settings_form($field, $instance, $has_data) {
 
   $form = array();
-  
+
   $defaults = field_info_field_settings($field['type']);
   $settings = array_merge($defaults, $field['settings']);
 
@@ -231,7 +239,7 @@ function gsb_feature_slideshow_field_settings_form($field, $instance, $has_data)
   foreach (file_get_stream_wrappers(STREAM_WRAPPERS_WRITE_VISIBLE) as $scheme => $stream_wrapper) {
     $scheme_options[$scheme] = $stream_wrapper['name'];
   }
-  
+
   $form['uri_scheme'] = array(
     '#type' => 'radios',
     '#title' => t('Upload destination'),
@@ -262,13 +270,13 @@ function gsb_feature_slideshow_field_instance_settings_form($field, $instance) {
   return $form;
 }
 
-// Formatter 
+// Formatter
 
 /**
  * Implementation of hook_field_formatter_info().
  *
- * Here we tell Drupal about our custom field formatter - 
- * 'gsb_slideshow_default_format'. 
+ * Here we tell Drupal about our custom field formatter -
+ * 'gsb_slideshow_default_format'.
  *
  */
 function gsb_feature_slideshow_field_formatter_info() {
@@ -290,24 +298,24 @@ function gsb_feature_slideshow_field_formatter_view($entity_type, $entity, $fiel
 
   $settings = $display['settings'];
   $formatter = $display['type'];
-  
+
   drupal_add_library('system', 'ui.tabs');
 
   // Assemble the tabs header
   $header = '<ul>';
   foreach ($items as $delta => $item_data) {
-    $header .= '<li>' . '<a href="#panopoly-spotlight-' . $delta . '">' . ($delta+1) . '</a></li>'; 
+    $header .= '<li>' . '<a href="#panopoly-spotlight-' . $delta . '">' . ($delta+1) . '</a></li>';
   }
   $header .= '</ul>';
 
   // Assemble the tabs content
   foreach ($items as $delta => $item_data) {
-    $element[$delta]['#markup'] = ($delta == 0) ? 
-      $header . 
-      theme('gsb_slideshow_view', array('items' => $item_data, 'delta' => $delta, 'settings' => $settings)) : 
+    $element[$delta]['#markup'] = ($delta == 0) ?
+      $header .
+      theme('gsb_slideshow_view', array('items' => $item_data, 'delta' => $delta, 'settings' => $settings)) :
       theme('gsb_slideshow_view', array('items' => $item_data, 'delta' => $delta, 'settings' => $settings));
   }
-  
+
   return $element;
 }
 
@@ -320,7 +328,7 @@ function gsb_feature_slideshow_field_formatter_settings_form($field, $instance, 
 
   $display = $instance['display'][$view_mode];
   $settings = $display['settings'];
-  
+
   $element = array();
 
   if ($display['type'] == 'gsb_slideshow_default_format') {
@@ -342,7 +350,7 @@ function gsb_feature_slideshow_field_formatter_settings_summary($field, $instanc
 
   $display = $instance['display'][$view_mode];
   $settings = $display['settings'];
-  
+
   $summary = t('View Mode: @viewmode', array('@viewmode' => $settings['file_view_mode']));
 
   return $summary;
@@ -357,7 +365,7 @@ function gsb_feature_slideshow_field_presave($entity_type, $entity, $field, $ins
 
   // We need to set presave values if fids are not set. This shouldn't effect save operations
   // form API validation will prevent this from ever happening unless previewing.
-  
+
   if (!empty($items)) {
     foreach ($items as &$item) {
       if (empty($item['fid'])) {
@@ -367,13 +375,13 @@ function gsb_feature_slideshow_field_presave($entity_type, $entity, $field, $ins
         }
       }
     }
-    
+
     if (isset($items['fid']) && $items['fid'] != 0) {
       image_field_presave($entity_type, $entity, $field, $instance, $langcode, $items);
-    }    
+    }
 
   }
-  
+
 }
 
 /**
@@ -396,8 +404,8 @@ function gsb_feature_slideshow_field_insert($entity_type, $entity, $field, $inst
 function gsb_feature_slideshow_field_update($entity_type, $entity, $field, $instance, $langcode, &$items) {
 
   // Load the original entity, if $entity->original is not already set.
-  // This is done as per http://drupal.org/node/985642 and can be removed when that patch is committed. 
-  
+  // This is done as per http://drupal.org/node/985642 and can be removed when that patch is committed.
+
   if (empty($entity->original)) {
     $entity->original = entity_load_unchanged($entity_type, $field['id']);
   }
@@ -425,9 +433,9 @@ function gsb_feature_slideshow_field_delete_revision($entity_type, $entity, $fie
  * Implements hook_field_prepare_view().
  */
 function gsb_feature_slideshow_field_prepare_view($entity_type, $entities, $field, $instances, $langcode, &$items) {
-  
+
   // If there are no files specified at all, use the default.
-  
+
   foreach ($entities as $id => $entity) {
     if (empty($items[$id]) && $field['settings']['default_image']) {
       if ($file = file_load($field['settings']['default_image'])) {
@@ -439,7 +447,7 @@ function gsb_feature_slideshow_field_prepare_view($entity_type, $entities, $fiel
       }
     }
   }
-  
+
 }
 
 // Theme hookup and markup
@@ -468,7 +476,7 @@ function theme_gsb_slideshow_view($variables) {
   $description = $variables['items']['description'];
   $button_text = $variables['items']['button_text'];
   $button_style = $variables['items']['button_style'];
-  
+
   if (module_exists('uuid')) {
     $image_entity = entity_uuid_load('file', array($variables['items']['uuid']));
     $image = file_load(array_pop($image_entity)->fid);
@@ -476,14 +484,14 @@ function theme_gsb_slideshow_view($variables) {
   else {
     $image = (object) $variables['items'];
   }
-  
+
   $link = $variables['items']['link'];
   $settings = $variables['settings'];
 
   if ($variables['items'] == null) {
     return;
   }
-  
+
   $image = file_view((object) $variables['items'], $variables['settings']['file_view_mode']);
 
   $output = '<div id="' . 'panopoly-spotlight-' . $variables['delta'] . '" class="' . 'panopoly-spotlight' . '">';
