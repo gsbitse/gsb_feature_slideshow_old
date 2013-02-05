@@ -40,8 +40,6 @@ function gsb_feature_slideshow_init() {
 
   // create the GSB Slideshow FPP
 
-   $test = 'test';
-
   $entity_info['fieldable_panels_pane']['bundles']['gsb_slideshow_fpp'] = array(
     'label' => t('Add slideshow'),
     'pane category' => t('GSB Slideshow FPP'),
@@ -147,15 +145,6 @@ function gsb_feature_slideshow_field_widget_form(&$form, &$form_state, $field, $
       '#type' => 'textfield',
       '#default_value' => isset($items[$delta]['link']) ? $items[$delta]['link'] : NULL,
     );
-
-    /*
-    $element['fid'] = array(
-      '#title' => 'Image',
-      '#type' => 'managed_file',
-      '#upload_location' => file_field_widget_uri($field, $instance),
-      '#default_value' => isset($items[$delta]['fid']) ? $items[$delta]['fid'] : NULL,
-    );
-    */
     
     $element['fid'] = array(
       '#title' => 'Image or Video',
@@ -175,39 +164,8 @@ function gsb_feature_slideshow_field_widget_form(&$form, &$form_state, $field, $
             'gsb_media_center_video'
           ),
         ),
-        // line 38 of profiles/gsb_public/modules/contrib/media/includes/media.browser.inc
-        //gsb_media_center_image
-        //gsb_media_center_video
-        //gsb_media_browser--images
-        //gsb_media_browser--videos
-        //gsb_media_browser--files_and_docs
-        //gsb_media_center_document
-        //media_default--media_browser_1
-        //media_default--media_browser_my_files
-        //media_internet
-        //upload
       )
     );
-
-  /*
-  $element += array(
-    '#type' => 'media', // Would like to make this a fieldset, but throws some weird warning about element_children... not sure what it is about yet.
-    '#collapsed' => TRUE,
-    '#default_value' => $current_value,
-    '#required' => $instance['required'],
-    '#media_options' => array(
-      'global' => array(
-        'types' => array_filter($widget_settings['allowed_types']),
-        'enabledPlugins' => array_filter($instance['widget']['settings']['browser_plugins']),
-        'schemes' => $widget_settings['allowed_schemes'],
-        'file_directory' => isset($field_settings['file_directory']) ? $field_settings['file_directory'] : '',
-        'file_extensions' => isset($field_settings['file_extensions']) ? $field_settings['file_extensions'] : media_variable_get('file_extensions'),
-        'max_filesize' => isset($field_settings['max_filesize']) ? $field_settings['max_filesize'] : 0,
-        'uri_scheme' => !empty($field['settings']['uri_scheme']) ? $field['settings']['uri_scheme'] : file_default_scheme(),
-      ),
-    ),
-  );
-  */    
 
     $element['description'] = array(
       '#title' => 'Description',
@@ -371,7 +329,6 @@ function gsb_feature_slideshow_field_formatter_settings_form($field, $instance, 
       '#type'    => 'select',
       '#options' => file_entity_view_mode_labels(),
       '#default_value' => $settings['file_view_mode'],
-      // Never empty, so no #empty_option
     );
   }
 
@@ -386,8 +343,6 @@ function gsb_feature_slideshow_field_formatter_settings_summary($field, $instanc
   $display = $instance['display'][$view_mode];
   $settings = $display['settings'];
   
-  //$summary = t('Image Style: @style', array('@style' => $settings['image_style']));
-
   $summary = t('View Mode: @viewmode', array('@viewmode' => $settings['file_view_mode']));
 
   return $summary;
