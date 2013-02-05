@@ -42,7 +42,18 @@ function gsb_feature_slideshow_field_default_fields() {
     ),
     'field_instance' => array(
       'bundle' => 'gsb_slideshow_fpp',
-      'default_value' => NULL,
+      'default_value' => array(
+        0 => array(
+          'title' => '',
+          'link' => '',
+          'fid' => array(
+            'fid' => '0',
+          ),
+          'description' => '',
+          'button_text' => '',
+          'button_style' => 'style 1',
+        ),
+      ),
       'deleted' => '0',
       'description' => '',
       'display' => array(
@@ -50,10 +61,10 @@ function gsb_feature_slideshow_field_default_fields() {
           'label' => 'above',
           'module' => 'gsb_feature_slideshow',
           'settings' => array(
-            'image_style' => 'panopoly_image_spotlight',
+            'file_view_mode' => 'gsb_slideshow',
           ),
           'type' => 'gsb_slideshow_default_format',
-          'weight' => 0,
+          'weight' => '0',
         ),
       ),
       'entity_type' => 'fieldable_panels_pane',
