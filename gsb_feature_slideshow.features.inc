@@ -28,7 +28,7 @@ function gsb_feature_slideshow_image_default_styles() {
   $styles['gsb_slideshow'] = array(
     'name' => 'gsb_slideshow',
     'effects' => array(
-      7 => array(
+      8 => array(
         'label' => 'Scale and crop',
         'help' => 'Scale and crop will maintain the aspect-ratio of the original image, then crop the larger dimension. This is most useful for creating perfectly square thumbnails without stretching the image.',
         'effect callback' => 'image_scale_and_crop_effect',
@@ -38,8 +38,8 @@ function gsb_feature_slideshow_image_default_styles() {
         'module' => 'image',
         'name' => 'image_scale_and_crop',
         'data' => array(
-          'width' => '500',
-          'height' => '400',
+          'width' => '570',
+          'height' => '365',
         ),
         'weight' => '1',
       ),
