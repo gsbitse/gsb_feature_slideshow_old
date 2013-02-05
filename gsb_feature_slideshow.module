@@ -189,7 +189,7 @@ function gsb_feature_slideshow_field_widget_form(&$form, &$form_state, $field, $
       '#default_value' => isset($items[$delta]['button_text']) ? $items[$delta]['button_text'] : NULL,
     );
 
-    $options = drupal_map_assoc(array("style 1", "style 2", "style 3"));
+    $options = drupal_map_assoc(array("style-1", "style-2", "style-3"));
     $element['button_style'] = array(
       '#title' => 'Button Style',
       '#type' => 'select',
@@ -537,17 +537,16 @@ function theme_gsb_slideshow_view($variables) {
     $output .=  l($img_tag, $video_path, array('attributes' => array('class' => 'fancybox fancybox.iframe'), 'html' => TRUE));
     $output .=  '<span class="video-play-icon"></span></div>';
   }
-
+  
+  $output = theme('image_style', array('style_name' => $settings['image_style'], 'path' => $image->uri));
   $output .= '<div class="panopoly-spotlight-wrapper">';
-  $output .= '<h3 class="panopoly-spotlight-label">' . t('Slideshow') . '</h3>';
+  // $output .= '<h3 class="panopoly-spotlight-label">' . t('Slideshow') . '</h3>';
   $output .= '<div class="panopoly-spotlight-info">';
   $output .= '<h2>' . l($title, $link) . '</h2>';
   $output .= '<p>' . $description . '</p>';
-  $output .= '<p>' . $button_text . '</p>';
-  $output .= '<p>' . $button_style . '</p>';
+  $output .= '<a href="' . $link . '" class="slider-btn ' . $button_style . '">' . $button_text . '</a>';
   $output .= '</div>';
-  $output .= '</div>';
-  $output .= '</div>';
+  $output .= '</div>';  
 
   return $output;
 }
