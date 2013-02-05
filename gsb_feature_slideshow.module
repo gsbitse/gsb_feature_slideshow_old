@@ -215,8 +215,7 @@ function gsb_feature_slideshow_field_is_empty($item, $field) {
       empty($item['link']) &&
       empty($item['description']) &&
       empty($item['button_text']) &&
-      empty($item['button_style']) &&
-      empty($item['fid'])) {
+      (empty($item['fid']) || $item['fid']['fid'] == 0)) {
     return TRUE;
   }
   return FALSE;
