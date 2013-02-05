@@ -494,13 +494,13 @@ function theme_gsb_slideshow_view($variables) {
 
   $image = file_view((object) $variables['items'], $variables['settings']['file_view_mode']);
 
-  $output = '<div id="' . 'panopoly-spotlight-' . $variables['delta'] . '" class="' . 'panopoly-spotlight' . '">';
+  //$output = '<div id="' . 'panopoly-spotlight-' . $variables['delta'] . '" class="' . 'panopoly-spotlight' . '">';
 
   if ($variables['items']['type'] == 'image') {
 
     // Render the image
 
-    $output .= render($image);
+    $output = render($image);
 
   }
   elseif ($variables['items']['type'] == 'video') {
@@ -533,16 +533,18 @@ function theme_gsb_slideshow_view($variables) {
 
     // Print a link wrapper so that it can open in a modal.
 
-    $output .= '<div class="field field-type-image field-name-field-gsb-spotlight-media">';
+    $output = '<div class="field field-type-image field-name-field-gsb-spotlight-media">';
     $output .=  l($img_tag, $video_path, array('attributes' => array('class' => 'fancybox fancybox.iframe'), 'html' => TRUE));
     $output .=  '<span class="video-play-icon"></span></div>';
   }
   
-  $output = theme('image_style', array('style_name' => $settings['image_style'], 'path' => $image->uri));
-  $output .= '<div class="panopoly-spotlight-wrapper">';
+  //$output = theme('image_style', array('style_name' => $settings['image_style'], 'path' => $image->uri));
+  //$output = render($image);
+
+  $output .= '<div class="panopoly-spotlight-wrapper ' . $button_style . '">';
   // $output .= '<h3 class="panopoly-spotlight-label">' . t('Slideshow') . '</h3>';
   $output .= '<div class="panopoly-spotlight-info">';
-  $output .= '<h2>' . l($title, $link) . '</h2>';
+  $output .= '<h2><a href="' . $link . '">' . $title . '<i></i></a></h2>';
   $output .= '<p>' . $description . '</p>';
   $output .= '<a href="' . $link . '" class="slider-btn ' . $button_style . '">' . $button_text . '</a>';
   $output .= '</div>';
