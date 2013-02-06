@@ -13,41 +13,58 @@ Drupal.settings.gsb_slideshow_settings = Drupal.settings.gsb_slideshow_settings 
 
       sliders.each(function() {
         var $this = $(this),
-          sliderHolder = $this.find('.field-items'),
-          sliderItems = sliderHolder.find('.field-item'),
-          sliderWidth = $this.width(),
-          sliderAutoplay = setInterval(function(){ slideshowPlay() }, rotation_time);
-
+            sliderHolder = $this.find('.field-items'),
+            sliderItems = sliderHolder.find('.field-item'),
+            sliderWidth = $this.width(),
+            sliderAutoplay = setInterval(function(){ slideshowPlay(1) }, rotation_time);
+        sliderItems.width(sliderWidth).first().addClass(activeClass);
+        sliderHolder.width(sliderWidth * sliderItems.length);
         $this.find('.field-item:first>ul').insertAfter($this.find('.field-items')).addClass('slider-navigation');
         var sliderNavigation = $this.find('.slider-navigation');
-
         sliderNavigation.find('li').first().addClass(activeClass);
-        sliderItems.first().addClass(activeClass);
-        sliderHolder.width(sliderWidth * sliderItems.length);
-        sliderItems.width(sliderWidth);
 
         sliderNavigation.find('li a').click(function(e) {
+          var $this = $(this);
+          if (!$this.parent().hasClass('active')) {
+            slideshowPlay(1, $this.parent().index());
+          }
           slideshowStop();
-          var _this = $(this),
-              parentIndex = _this.parent().index();
-          sliderItems.removeClass(activeClass);
-          sliderItems.eq(parentIndex).addClass(activeClass);
-          sliderHolder.animate({'margin-left': (-1)*parentIndex*sliderWidth}, 400);
-          _this.parent().siblings().removeClass(activeClass);
-          _this.parent().addClass(activeClass);
           e.preventDefault();
         });
-
-        function slideshowPlay() {
-          var currentActive = sliderItems.filter('.'+activeClass).index();
-          if (currentActive == (sliderItems.length - 1)) {
-            currentActive = -1;
+        $this.append('<div class="slider-arrows"/>');
+        sliderArrows = $this.find('.slider-arrows');
+        sliderArrows.append('<div class="slider-left"/>')
+          .append('<div class="slider-right"/>');
+          
+        sliderArrows.find('div').click(function () {
+          slideshowStop();
+          if ($(this).hasClass('slider-left')) {
+            slideshowPlay(-1);
+          } else {
+            slideshowPlay(1);
           }
-          sliderItems.removeClass(activeClass);
-          sliderItems.eq(currentActive+1).addClass(activeClass);
-          sliderNavigation.find('li').removeClass(activeClass);
-          sliderNavigation.find('li').eq(currentActive+1).addClass(activeClass);
-          sliderHolder.animate({'margin-left': (-1)*(currentActive+1)*sliderWidth}, 400);
+        });
+
+        function slideshowPlay(dir, goto) {
+          if (parseInt(goto) > -1) {
+            var sliderToGo = goto; 
+          } else {
+            var currentActive = sliderItems.filter('.'+activeClass).index(),
+              direction = dir;
+            if (dir == 1) {
+              if (currentActive == (sliderItems.length - 1)) {
+                currentActive = -1;
+              }
+            } else {
+              if (currentActive == 0) {
+                currentActive = sliderItems.length;
+              }
+            }
+            sliderToGo = currentActive + dir;
+          }
+          sliderItems.removeClass(activeClass).eq(sliderToGo).addClass(activeClass);
+          sliderNavigation.find('li').removeClass(activeClass).eq(sliderToGo).addClass(activeClass);
+          sliderHolder.animate({'margin-left': (-1)*(sliderToGo)*sliderWidth}, 400);
         }
 
         function slideshowStop() {
@@ -55,7 +72,6 @@ Drupal.settings.gsb_slideshow_settings = Drupal.settings.gsb_slideshow_settings 
         }
 
       });
-
    }
  }
 
