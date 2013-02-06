@@ -10,7 +10,6 @@ dependencies[] = defaultconfig
 dependencies[] = fancybox
 dependencies[] = features
 dependencies[] = file_entity
-dependencies[] = gsb_feature_slideshow
 dependencies[] = image
 dependencies[] = strongarm
 datestamp = 1360100373
