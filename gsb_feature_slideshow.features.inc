@@ -38,8 +38,8 @@ function gsb_feature_slideshow_image_default_styles() {
         'module' => 'image',
         'name' => 'image_scale_and_crop',
         'data' => array(
-          'width' => '570',
-          'height' => '365',
+          'width' => '627',
+          'height' => '367',
         ),
         'weight' => '1',
       ),
