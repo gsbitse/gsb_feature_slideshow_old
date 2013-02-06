@@ -211,11 +211,7 @@ function gsb_feature_slideshow_field_widget_form(&$form, &$form_state, $field, $
  *
  */
 function gsb_feature_slideshow_field_is_empty($item, $field) {
-  if (empty($item['title']) &&
-      empty($item['link']) &&
-      empty($item['description']) &&
-      empty($item['button_text']) &&
-      (empty($item['fid']) || $item['fid']['fid'] == 0)) {
+  if (empty($item['title'])) {
     return TRUE;
   }
   return FALSE;
@@ -491,58 +487,57 @@ function theme_gsb_slideshow_view($variables) {
     return;
   }
 
-  $image = file_view((object) $variables['items'], $variables['settings']['file_view_mode']);
+  if (!empty($variables['items']['fid'])) {
 
-  //$output = '<div id="' . 'panopoly-spotlight-' . $variables['delta'] . '" class="' . 'panopoly-spotlight' . '">';
+    $image = file_view((object) $variables['items'], $variables['settings']['file_view_mode']);
 
-  if ($variables['items']['type'] == 'image') {
+    if ($variables['items']['type'] == 'image') {
 
-    // Render the image
+      // Render the image
 
-    $output = render($image);
+      $output = render($image);
 
-  }
-  elseif ($variables['items']['type'] == 'video') {
+    }
+    elseif ($variables['items']['type'] == 'video') {
 
-    // Get the video path.
+      // Get the video path.
 
-    $video_path = drupal_realpath($variables['items']['uri']);
+      $video_path = drupal_realpath($variables['items']['uri']);
 
-    // If it's a youtube video we need to use the embed url.
+      // If it's a youtube video we need to use the embed url.
 
-    if ($variables['items']['filemime'] == 'video/youtube') {
-      $video_parts = drupal_parse_url($video_path);
-      if (stristr($video_parts['path'], 'watch')) {
-        $video_path = str_replace('watch', 'embed', $video_parts['path']) . "/" . $video_parts['query']['v'];
+      if ($variables['items']['filemime'] == 'video/youtube') {
+        $video_parts = drupal_parse_url($video_path);
+        if (stristr($video_parts['path'], 'watch')) {
+          $video_path = str_replace('watch', 'embed', $video_parts['path']) . "/" . $video_parts['query']['v'];
+        }
+        $video_path .= '?autoplay=1';
       }
-      $video_path .= '?autoplay=1';
+
+      // Create the image.
+
+      $img_tag = theme_image_style(array(
+        'style_name' => $image['file']['#style_name'],
+        'path' => $image['file']['#path'],
+        'alt' => $variables['items']['filename'],
+        'width' => NULL,
+        'height' => NULL
+      ));
+
+      // Print a link wrapper so that it can open in a modal.
+
+      $output = '<div class="field field-type-image field-name-field-gsb-spotlight-media">';
+      $output .=  l($img_tag, $video_path, array('attributes' => array('class' => 'fancybox fancybox.iframe'), 'html' => TRUE));
+      $output .=  '<span class="video-play-icon"></span></div>';
+
     }
 
-    // Create the image.
-
-    //$output .= render($image);
-
-    $img_tag = theme_image_style(array(
-      'style_name' => $image['file']['#style_name'],
-      'path' => $image['file']['#path'],
-      'alt' => $variables['items']['filename'],
-      'width' => NULL,
-      'height' => NULL
-    ));
-
-    // Print a link wrapper so that it can open in a modal.
-
-    $output = '<div class="field field-type-image field-name-field-gsb-spotlight-media">';
-    $output .=  l($img_tag, $video_path, array('attributes' => array('class' => 'fancybox fancybox.iframe'), 'html' => TRUE));
-    $output .=  '<span class="video-play-icon"></span></div>';
-   
   }
-  
-  //$output = theme('image_style', array('style_name' => $settings['image_style'], 'path' => $image->uri));
-  //$output = render($image);
 
-  $output .= '<div class="panopoly-spotlight-wrapper ' . $button_style . '">';
-  // $output .= '<h3 class="panopoly-spotlight-label">' . t('Slideshow') . '</h3>';
+  $class = 'panopoly-spotlight-wrapper ' . $button_style;
+  $class .= (empty($variables['item']['fid'])) ? " no-image" : "";
+  $output .= '<div class="' . $class . '">';
+
   $output .= '<div class="panopoly-spotlight-info">';
   $output .= '<h2><a href="' . $link . '">' . $title . '<i></i></a></h2>';
   $output .= '<p>' . $description . '</p>';
