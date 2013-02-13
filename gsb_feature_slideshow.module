@@ -471,6 +471,10 @@ function gsb_feature_slideshow_theme($existing, $type, $theme, $path) {
  * Theme function for table view
  */
 function theme_gsb_slideshow_view($variables) {
+  
+  if ($variables['items'] == null) {
+    return;
+  }  
 
   $title = $variables['items']['title'];
   $description = $variables['items']['description'];
@@ -487,10 +491,6 @@ function theme_gsb_slideshow_view($variables) {
 
   $link = $variables['items']['link'];
   $settings = $variables['settings'];
-
-  if ($variables['items'] == null) {
-    return;
-  }
 
   if (!empty($variables['items']['fid'])) {
 
