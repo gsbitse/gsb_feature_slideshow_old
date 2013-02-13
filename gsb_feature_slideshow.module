@@ -471,11 +471,11 @@ function gsb_feature_slideshow_theme($existing, $type, $theme, $path) {
  * Theme function for table view
  */
 function theme_gsb_slideshow_view($variables) {
-  
+
   if ($variables['items'] == null) {
     return;
-  }  
-
+  }
+  
   $title = $variables['items']['title'];
   $description = $variables['items']['description'];
   $button_text = $variables['items']['button_text'];
@@ -544,9 +544,29 @@ function theme_gsb_slideshow_view($variables) {
   $output .= '<div class="' . $class . '">';
 
   $output .= '<div class="panopoly-spotlight-info">';
-  $output .= '<h2><a href="' . $link . '">' . $title . '<i></i></a></h2>';
+  $output .= '<h2>';
+
+  if (!empty($link)) {
+    $output .= '<a href="' . $link . '">';
+  }
+
+  if (!empty($title)) {
+    $output .= $title;
+  }
+  $output .= '<i></i>';
+
+  if (!empty($link)) {
+    $output .= '</a>';
+  }
+
+  $output .= '</h2>';
+  
   $output .= '<p>' . $description . '</p>';
-  $output .= '<a href="' . $link . '" class="slider-btn ' . $button_style . '">' . $button_text . '</a>';
+
+  if (!empty($link) && !empty($button_text)) {
+    $output .= '<a href="' . $link . '" class="slider-btn ' . $button_style . '">' . $button_text . '</a>';
+  }
+
   $output .= '</div>';
   $output .= '</div>';  
 
