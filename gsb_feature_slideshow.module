@@ -61,6 +61,10 @@ function gsb_feature_slideshow_init() {
       'access arguments' => array('administer fieldable panels panes'),
     ),
   );
+  
+  if (empty($entity_info['fieldable_panels_pane']['controller class'])) {
+    $entity_info['fieldable_panels_pane']['controller class'] = 'PanelsPaneController';
+  }
 
   // create the slide show view mode
 
