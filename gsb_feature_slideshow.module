@@ -174,8 +174,11 @@ function gsb_feature_slideshow_field_widget_form(&$form, &$form_state, $field, $
       )
     ); 
     
-    if (isset($items[$delta]) && isset($items[$delta]['fid']) && !isset($items[$delta]['fid']['fid']) ) {
+    //if (isset($items[$delta]) && isset($items[$delta]['fid']) && !isset($items[$delta]['fid']['fid']) ) {
+    if (isset($items[$delta]) && isset($items[$delta]['fid']) && !is_array($items[$delta]['fid'])) {
       $element['fid']['#default_value'] = array('fid' => $items[$delta]['fid']);
+    } else {
+      $element['fid']['#default_value'] = null;
     }    
 
     $element['description'] = array(
