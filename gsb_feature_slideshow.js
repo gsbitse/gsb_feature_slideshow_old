@@ -17,30 +17,9 @@ Drupal.settings.gsb_slideshow_settings = Drupal.settings.gsb_slideshow_settings 
         if (!$this.hasClass('slideshow-processed')) {
           var sliderHolder = $this.find('.field-items'),
               sliderItems = sliderHolder.find('.field-item'),
-              sliderWidth = $this.width(),
-              sliderAutoplay = setInterval(function(){ 
-                if ($this.hasClass('autoplay-next')) {
-                  slideshowPlay(1);
-                }
-              }, rotation_time); /* slider autoplay timer */
+              sliderWidth = $this.width();
 
           $this.addClass('slideshow-processed');
-
-          $this.hover(function(e) {
-            e.stopPropagation();
-            if ($this.hasClass('autoplay')) {
-              $this.removeClass('autoplay-next');
-            }
-          }, function(e) {
-            e.stopPropagation();
-            if ($this.hasClass('autoplay')) {
-              $this.removeClass('autoplay-next').addClass('autoplay-next');
-            }
-          }); /* end slider hover stop */
-
-          if (autoplay) {
-            $this.addClass('autoplay autoplay-next');
-          } /* end autpoplay function */
 
           sliderItems.width(sliderWidth).first().addClass(activeClass);
           sliderHolder.width(sliderWidth * sliderItems.length);
@@ -52,9 +31,6 @@ Drupal.settings.gsb_slideshow_settings = Drupal.settings.gsb_slideshow_settings 
             var $this = $(this);
             if (!$this.parent().hasClass('active')) {
               slideshowPlay(1, $this.parent().index());
-            }
-            if ($this.parents('.autoplay').length > 0) {
-              slideshowStop();
             }
             e.preventDefault();
             e.stopPropagation();
@@ -73,9 +49,6 @@ Drupal.settings.gsb_slideshow_settings = Drupal.settings.gsb_slideshow_settings 
             e.stopPropagation();
             var allNav = sliderNavigation.find('li'),
                 activeNav = allNav.filter('.active');
-            if ($this.hasClass('autoplay')) {
-              slideshowStop();
-            }
             if ($(this).hasClass('slider-left')) {          
               (activeNav.prev().text() > 0) ? activeNav.prev().find('a').click() : allNav.last().find('a').click();
             } else {
@@ -84,66 +57,90 @@ Drupal.settings.gsb_slideshow_settings = Drupal.settings.gsb_slideshow_settings 
           }); /* end slider navigation arrows function */
 
           if (windowhash > -1) {
-            sliderItems.removeClass(activeClass);
-            sliderItems.eq(windowhash).addClass(activeClass);
-            slideshowPlay(1, windowhash, 1);
-          } /* end hash check function */
-
-          function slideshowPlay(dir, goto, anispeed) {
-           var anispeed = anispeed ? anispeed : animationSpeed,
-            currentActive = sliderItems.filter('.' + activeClass).index() != -1 ? sliderItems.filter('.' + activeClass).index() : 0,
-              slideDiff = 1;
-            if (parseInt(goto) > -1) {
-              sliderToGo = goto;
-              slideDiff = sliderToGo - currentActive;
-            } else {
-              var direction = dir;
-                if (currentActive == (sliderItems.length - 1)) {
-                  newSlider = -1;
-                  slideDiff = (-1) * sliderItems.length + 1;
-                } else {
-                  newSlider = currentActive;
-                }
-              sliderToGo = newSlider + dir;            
-            }
-              sharpy.css('margin-left', sliderHolder.css('margin-left'));
-              sliderItems.removeClass(activeClass).eq(sliderToGo).addClass(activeClass);
-              sliderNavigation.find('li').removeClass(activeClass).eq(sliderToGo).addClass(activeClass);
-            if (Math.abs(slideDiff) == 1) { 
-              var finaldestination = (-1)*(sliderToGo)*sliderWidth;             
-              sharpy.stop().animate({'margin-left' : finaldestination }, {
-                duration: anispeed,
+            var hashspeed = 10,
+              animateto = (-1) * windowhash * sliderWidth;
+          } else {
+            windowhash = 0;
+            sharpy.css('margin-left', (-1) * sliderWidth);
+            sliderHolder.css('margin-left', (-1) * sliderWidth);
+            console.log(sharpy.css('margin-left'));
+            console.log(sliderHolder.css('margin-left'));
+            var hashspeed = 1500,
+              animateto = 0;
+          }
+            console.log(animateto);
+            console.log((-1) * sliderWidth * 2);
+            sliderItems.removeClass(activeClass).eq(windowhash).addClass(activeClass);
+            sliderNavigation.find('li').removeClass(activeClass).eq(windowhash).addClass(activeClass);
+            sharpy.animate({'margin-left' : animateto }, {
+                duration: hashspeed,
                 step: function(now, fx) {
+                  console.log(now);
                   sliderHolder.css('margin-left', parseInt(now));
                 }
-              });      
-            } else {
-              var nowActive = sliderItems.eq(sliderToGo),
-                moveSymbol = (slideDiff * 2 + 1) % (-2);
-              nowActive.css({'position' : 'absolute', 'left' : (currentActive + moveSymbol)*sliderWidth, 'z-index' : 102});
-              nowActive.next().css('margin-left', sliderWidth);
-              var finaldestination = (-1)*(currentActive + moveSymbol)*sliderWidth; 
-              sharpy.stop().animate({'margin-left' : finaldestination}, 
-                {
+              }); 
+
+          function slideshowPlay(dir, goto, anispeed) {
+            if (!$this.hasClass('animation-process')) {
+              $this.addClass('animation-process');
+              var anispeed = anispeed ? anispeed : animationSpeed,
+              currentActive = sliderItems.filter('.' + activeClass).index() != -1 ? sliderItems.filter('.' + activeClass).index() : 0,
+                slideDiff = 1;
+              if (parseInt(goto) > -1) {
+                sliderToGo = goto;
+                slideDiff = sliderToGo - currentActive;
+              } 
+                sharpy.css('margin-left', sliderHolder.css('margin-left'));
+                sliderItems.removeClass(activeClass).eq(sliderToGo).addClass(activeClass);
+                sliderNavigation.find('li').removeClass(activeClass).eq(sliderToGo).addClass(activeClass);
+              
+              if (Math.abs(slideDiff) == 1) { 
+                var finaldestination = (-1)*(sliderToGo)*sliderWidth;             
+                sharpy.stop().animate({'margin-left' : finaldestination }, {
                   duration: anispeed,
                   step: function(now, fx) {
                     sliderHolder.css('margin-left', parseInt(now));
                   },
                   complete: function() {
-                    sliderHolder.css('margin-left', (-1)*(sliderToGo)*sliderWidth);
-                    nowActive.next().css('margin-left', 0);
-                    nowActive.css({'position': 'static', 'z-index': 90});
+                    $this.removeClass('animation-process');
                   }
+                });      
+              } else {
+                // moveSymbol = 1 с последнего на первый
+                var nowActive = sliderItems.eq(sliderToGo),
+                  moveSymbol = (slideDiff * 2 + 1) % (-2);
+                sliderHolder.width(sliderHolder.width() + sliderWidth);
+                if (moveSymbol == -1) {
+                  sliderItems.eq(0).clone().addClass('todelete').appendTo(sliderHolder);
+                  finaldestination = (-1) * sliderItems.length * sliderWidth;
+                } else {
+                  sliderItems.last().clone().addClass('todelete').prependTo(sliderHolder);
+                  sharpy.css('margin-left', (-1) * sliderWidth);
+                  console.log(sliderHolder.css('margin-left'));
+                  finaldestination = 0;
                 }
-              );  
+                console.log(sharpy.css('margin-left'));
+                sharpy.stop().animate({'margin-left' : finaldestination }, {
+                  duration: anispeed,
+                  step: function(now, fx) {
+                    sliderHolder.css('margin-left', parseInt(now));
+                  },
+                  complete: function() {
+                    if (moveSymbol == -1) {
+                      sliderHolder.css('margin-left', 0);
+                    } else {
+                      sliderHolder.css('margin-left', (-1) * (sliderItems.length - 1)  * sliderWidth);
+                    }                 
+                    sliderHolder.find('.todelete').remove();
+                    sliderHolder.width(sliderHolder.width() - sliderWidth);
+                    $this.removeClass('animation-process');
+                  }
+                }); 
+    
+              }
+              window.location.hash = sliderToGo;
             }
-            window.location.hash = sliderToGo;
           } /* end slideshow play function */
-
-          function slideshowStop() {
-            clearInterval(sliderAutoplay);
-            $this.removeClass('autoplay autoplay-next');
-          }
 
         } /* end processed condition */
 
