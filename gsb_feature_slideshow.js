@@ -61,8 +61,8 @@ Drupal.settings.gsb_slideshow_settings = Drupal.settings.gsb_slideshow_settings 
               animateto = (-1) * windowhash * sliderWidth;
           } else {
             windowhash = 0;
-            sharpy.css('margin-left', (-1) * sliderWidth);
-            sliderHolder.css('margin-left', (-1) * sliderWidth);
+            sharpy.css('margin-left', (-1) * sliderWidth * 2);
+            sliderHolder.css('margin-left', (-1) * sliderWidth * 2);
             console.log(sharpy.css('margin-left'));
             console.log(sliderHolder.css('margin-left'));
             var hashspeed = 1500,
