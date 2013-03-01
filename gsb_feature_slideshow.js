@@ -35,13 +35,14 @@ Drupal.settings.gsb_slideshow_settings = Drupal.settings.gsb_slideshow_settings 
             e.preventDefault();
             e.stopPropagation();
           }); /* end slider item navigation function */
-
+            if ( sliderItems.length > 1) {
             $this.append('<div class="large-slide-left"/>').append('<div class="large-slide-right"/>');
+            }
             $this.append('<span class="slider-sharpy"></span>');
             var sharpy = $this.find('.slider-sharpy');
             sliderNavigation.wrap('<div class="nav-circles"/>');
             $('.nav-circles').prepend('<div class="slide-arrow slider-left"/>').append('<div class="slide-arrow slider-right"/>');
-          
+            
             $('.large-slide-left').click(function(e) {e.stopPropagation(); $this.find('.slider-left').click();});
             $('.large-slide-right').click(function(e) {e.stopPropagation(); $this.find('.slider-right').click();});
 
@@ -56,26 +57,32 @@ Drupal.settings.gsb_slideshow_settings = Drupal.settings.gsb_slideshow_settings 
             }
           }); /* end slider navigation arrows function */
 
-          if (windowhash > -1) {
+          if ( windowhash > -1 ) {
+            if ( windowhash > sliderItems.length ) {
+              windowhash = 0;
+            }
+            if ( sliderItems.length == 1 ) {
+              return false;
+            }
             var hashspeed = 10,
               animateto = (-1) * windowhash * sliderWidth;
           } else {
+            if ( sliderItems.length > 2 ) {
+              var slideBy = 2;
+            } else  {
+              var slideBy = -1 + sliderItems.length;
+            } 
             windowhash = 0;
-            sharpy.css('margin-left', (-1) * sliderWidth * 2);
-            sliderHolder.css('margin-left', (-1) * sliderWidth * 2);
-            console.log(sharpy.css('margin-left'));
-            console.log(sliderHolder.css('margin-left'));
+            sharpy.css('margin-left', (-1) * sliderWidth * slideBy);
+            sliderHolder.css('margin-left', (-1) * sliderWidth * slideBy);
             var hashspeed = 1500,
               animateto = 0;
           }
-            console.log(animateto);
-            console.log((-1) * sliderWidth * 2);
             sliderItems.removeClass(activeClass).eq(windowhash).addClass(activeClass);
             sliderNavigation.find('li').removeClass(activeClass).eq(windowhash).addClass(activeClass);
             sharpy.animate({'margin-left' : animateto }, {
                 duration: hashspeed,
                 step: function(now, fx) {
-                  console.log(now);
                   sliderHolder.css('margin-left', parseInt(now));
                 }
               }); 
@@ -116,10 +123,8 @@ Drupal.settings.gsb_slideshow_settings = Drupal.settings.gsb_slideshow_settings 
                 } else {
                   sliderItems.last().clone().addClass('todelete').prependTo(sliderHolder);
                   sharpy.css('margin-left', (-1) * sliderWidth);
-                  console.log(sliderHolder.css('margin-left'));
                   finaldestination = 0;
                 }
-                console.log(sharpy.css('margin-left'));
                 sharpy.stop().animate({'margin-left' : finaldestination }, {
                   duration: anispeed,
                   step: function(now, fx) {
