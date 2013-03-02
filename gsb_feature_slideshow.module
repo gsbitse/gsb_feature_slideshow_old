@@ -146,6 +146,7 @@ function gsb_feature_slideshow_field_widget_form(&$form, &$form_state, $field, $
       '#title' => 'Title',
       '#type' => 'textfield',
       '#default_value' => isset($items[$delta]['title']) ? $items[$delta]['title'] : NULL,
+      '#element_validate' => array('gsb_feature_slideshow_pane_validate'),
     );
 
     $element['link'] = array(
@@ -208,6 +209,46 @@ function gsb_feature_slideshow_field_widget_form(&$form, &$form_state, $field, $
   }
 
   return $element;
+}
+
+/**
+ * Validate the widget form for the slideshow fpp
+ */
+function gsb_feature_slideshow_pane_validate($form, &$form_state) {
+
+  $name = $form['#name'];
+
+  $element = explode('][', $name);
+
+  $index = $element[1];
+
+  $title = $form_state['values']['field_gsb_slideshow']['und'][$index]['title'];
+  $description = $form_state['values']['field_gsb_slideshow']['und'][$index]['description'];
+
+  // if we have a image
+  if (isset($form_state['values']['field_gsb_slideshow']['und'][$index]) &&
+      is_array($form_state['values']['field_gsb_slideshow']['und'][$index]['fid']) &&
+      $form_state['values']['field_gsb_slideshow']['und'][$index]['fid']['fid'] != '0' ) {
+
+    // we need at least a title
+    if (empty($title)) {
+      form_set_error('field_gsb_slideshow][und][' . $index . '][title', t('You need to enter a title'));
+    }
+
+  } /* else {
+
+    // if we don't have an image, we need at least a title and description
+
+    if (empty($title)) {
+      form_set_error('field_gsb_slideshow][und][' . $index . '][title', t('You need to enter a title'));
+    }
+
+    if (empty($description)) {
+      form_set_error('field_gsb_slideshow][und][' . $index . '][description', t('You need to enter a description'));
+    }
+
+  } */
+
 }
 
 /**
