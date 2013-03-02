@@ -185,6 +185,8 @@ function gsb_feature_slideshow_field_widget_form(&$form, &$form_state, $field, $
       '#title' => 'Description',
       '#type' => 'textarea',
       '#rows' => '2',
+      '#maxlength' => '300',
+      '#description' => t('Limited to 300 characters'),
       '#resizable' => FALSE,
       '#default_value' => isset($items[$delta]['description']) ? $items[$delta]['description'] : NULL,
     );
