@@ -205,7 +205,6 @@ function gsb_feature_slideshow_field_widget_form(&$form, &$form_state, $field, $
       '#default_value' => isset($items[$delta]['button_style']) ? $items[$delta]['button_style'] : NULL,
     );
 
-    /**/
     $field_parents = $element['#field_parents'];
     $field_name = $element['#field_name'];
     $language = $element['#language'];
@@ -229,7 +228,6 @@ function gsb_feature_slideshow_field_widget_form(&$form, &$form_state, $field, $
       ),
       '#weight' => 1000,
     );
-    /**/
 
   }
 
@@ -404,9 +402,9 @@ function gsb_feature_slideshow_remove_submit($form, &$form_state) {
  */
 function gsb_feature_slideshow_field_is_empty($item, $field) {
   if (empty($item['title'])) {
-    if (!empty($item['fid'])) {
-      drupal_set_message(t('Please add a title for the slide'), 'status', FALSE);
-    }
+    //if (!empty($item['fid'])) {
+      //drupal_set_message(t('Please add a title for the slide'), 'status', FALSE);
+    //}
     return TRUE;
   }
   return FALSE;
