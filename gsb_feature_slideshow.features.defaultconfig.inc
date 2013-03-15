@@ -247,7 +247,7 @@ function gsb_feature_slideshow_defaultconfig_file_default_displays() {
   $file_display->weight = 0;
   $file_display->status = TRUE;
   $file_display->settings = array(
-    'image_style' => 'gsb_image_small',
+    'image_style' => '270x158',
   );
   $export['video__preview__media_vimeo_image'] = $file_display;
 
@@ -257,7 +257,7 @@ function gsb_feature_slideshow_defaultconfig_file_default_displays() {
   $file_display->weight = 0;
   $file_display->status = TRUE;
   $file_display->settings = array(
-    'image_style' => 'gsb_image_small',
+    'image_style' => '270x158',
   );
   $export['video__preview__media_youtube_image'] = $file_display;
 
