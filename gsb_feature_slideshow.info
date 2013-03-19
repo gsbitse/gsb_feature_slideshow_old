@@ -68,8 +68,4 @@ features[variable][] = field_bundle_settings_fieldable_panels_pane__gsb_slidesho
 required = 1
 
 
-; Information added by drush on 2013-03-18
-version = "1.0"
-project = "gsb_feature_slideshow"
-datestamp = "1363619466"
 
