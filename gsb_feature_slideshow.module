@@ -80,31 +80,21 @@ function gsb_feature_slideshow_form_alter(&$form, &$form_state, $form_id) {
 
     $test = "test";
 
-    $form['widget_settings']['slide_style'] = array(
-      '#title' => 'Slide Style',
-      '#type' => 'radios',
-      '#options' => array(
-        'HomePage' => t('Home Page'),
-        'TypicalPage' => t('Typical Page'),
-      ),
-      '#default_value' => 'TypicalPage',
-    );
-
     foreach ($form['field_gsb_slideshow']['und'] as $key => &$value) {
       if (!is_int($key)) {
         continue;
       }
       $form['field_gsb_slideshow']['und'][$key]['button_style']['#states'] = array(
         'visible' => array(
-          ':input[name="slide_style"]' => array(
-            array('value' => 'TypicalPage'),
+          ':input[name="field_slideshow_type[und]"]' => array(
+            array('value' => 'standard-slider'),
           ),
         ),
       );
       $form['field_gsb_slideshow']['und'][$key]['button_text']['#states'] = array(
         'visible' => array(
-          ':input[name="slide_style"]' => array(
-            array('value' => 'TypicalPage'),
+          ':input[name="field_slideshow_type[und]"]' => array(
+            array('value' => 'standard-slider'),
           ),
         ),
       );
