@@ -78,8 +78,6 @@ function gsb_feature_slideshow_form_alter(&$form, &$form_state, $form_id) {
 
   if ($form_id == 'fieldable_panels_panes_fieldable_panels_pane_content_type_edit_form' && $form['#bundle'] == 'gsb_slideshow_fpp') {
 
-    $test = "test";
-
     foreach ($form['field_gsb_slideshow']['und'] as $key => &$value) {
       if (!is_int($key)) {
         continue;
